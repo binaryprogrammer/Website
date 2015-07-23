@@ -29,6 +29,7 @@
 		<script src="js/vendor/Projector.js"></script>			<!-- idk -->
 		<script src="js/vendor/CanvasRenderer.js"></script>		<!-- idk -->
 		<script src="js/vendor/Detector.js"></script> 			<!-- Detects if HTML5 is supported in browser -->
+		<script src="js/vendor/tween.min.js"></script>			<!-- Tween helper script -->
 		<script src="js/vendor/stats.min.js"></script>			<!-- Debug script for three.js -->
 		
         <script src="js/plugins.js"></script>
@@ -50,51 +51,28 @@
 			var video, image, imageContext,
 			imageReflection, imageReflectionContext, imageReflectionGradient,
 			texture, textureReflection;
-			
-			var materialLUT = {}; // material for binary
 
 			var mesh;
-
-			var mouseX = 0;
-			var mouseY = 0;
+			
+			var mouse;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-
 			//
-
-			var raycaster;
-			var mouse;
-
-			var PI2 = Math.PI * 2;
-
-			var programFill = function ( context ) {
-
-				//context.beginPath();
-				//context.arc( 0, 0, 0.5, 0, PI2, true );
-				//context.fill();
-
-				var fontSize = 3;
+			var program0 = function ( context ) 
+			{
+				var fontSize = 5;
 				context.font = fontSize+'px Monospace';
 				context.fillText("0", fontSize, fontSize);
-				
-				/*var tex = new THREE.Texture();
-					tex.flipY = false;
-			        tex.needsUpdate = true;
-			        retMaterial = materialLUT[character] = new THREE.SpriteMaterial({ color: 0x000000, map: tex });*/
 			}
-
-			var programStroke = function ( context ) {
-
-				context.lineWidth = 0.025;
-				context.beginPath();
-				context.arc( 0, 0, 0.5, 0, PI2, true );
-				context.stroke();
-
+			
+			var program1 = function ( context ) 
+			{
+				var fontSize = 5;
+				context.font = fontSize+'px Monospace';
+				context.fillText("1", fontSize, fontSize);
 			}
-
-			var INTERSECTED;
 			
 			//
 
@@ -107,29 +85,72 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.set( 0, 0, 1000 );
 				//camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 ); //particle camera settings
 				//camera.position.set( 0, 300, 500 ); //particle camera settings
 
 				scene = new THREE.Scene();
 
-				/*for ( var i = 0; i < 50; i ++ ) 
-				{
-					var tex = new THREE.Texture(programFill);
-					tex.flipY = false;
-			        tex.needsUpdate = true;
-					
-					var particle = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x000000, map: tex } ) );
-					//var particle = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x000000, program: programFill } ) );
-					particle.position.x = Math.random() * 800 - 400;
-					particle.position.y = Math.random() * 800 - 400;
-					particle.position.z = Math.random() * 800 - 400;
-					particle.scale.x = particle.scale.y = Math.random() * 20 + 20;
-					scene.add( particle );
+				/*for ( var i = 0; i < 1000; i++ ) {
+
+					var material = new THREE.SpriteCanvasMaterial( {
+						color: Math.random() * 0x808008 + 0x808080,
+						program: program
+					} );
+
+					particle = new THREE.Sprite( material );
+					particle.position.x = Math.random() * 2000 - 1000;
+					particle.position.y = Math.random() * 2000 - 1000;
+					particle.position.z = Math.random() * 2000 - 1000;
+					particle.scale.x = particle.scale.y = Math.random() * 20 + 10;
+					group.add( particle );
 				}*/
 				
+				var texture0 = THREE.ImageUtils.loadTexture("img/0.png");
+				texture0.flipY = true;
+				texture0.needsUpdate = true;
 				
+				var material0 = new THREE.SpriteMaterial( {
+					map: texture0,
+					transparent: true
+				} );
+				
+				var texture1 = THREE.ImageUtils.loadTexture("img/1.png");
+				texture1.flipY = true;
+				texture1.needsUpdate = true;
+				
+				var material1 = new THREE.SpriteMaterial( {
+					map: texture1,
+					transparent: true
+				} );
+				
+				group = new THREE.Group();
+				scene.add( group );
+				for ( var i = 0; i < 80; i ++ ) 
+				{
+					var particle = new THREE.Sprite( material0 );
+					//var particle = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x000000, program: program0, fog: false } ) );
+					particle.position.x = Math.random() * 4000 - 2000;
+					particle.position.y = Math.random() * 2000 - 1000;
+					particle.position.z = Math.random() * 1800 - 1000;
+					particle.scale.x = particle.scale.y = Math.random() * 20 + 20;
+					//particle.scale.y *= -1; //Hack to flip textures right side up.
+					particle.frustumCulled = false;
+					group.add( particle );
+				}
+				
+				for ( var i = 0; i < 80; i ++ ) 
+				{
+					var particle = new THREE.Sprite( material1 );
+					//var particle = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x000000, program: program1, fog: false } ) );
+					particle.position.x = Math.random() * 4000 - 2000;
+					particle.position.y = Math.random() * 2000 - 1000;
+					particle.position.z = Math.random() * 1800 - 1000;
+					particle.scale.x = particle.scale.y = Math.random() * 20 + 20;
+					//particle.scale.y *= -1; //Hack to flip textures right side up.
+					group.add( particle );
+				}
 				
 				video = document.getElementById( 'video' );
 
@@ -176,49 +197,6 @@
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
 				scene.add( mesh );
 
-				var field = new THREE.Object3D();
-				for (var i = 0; i < 1; i++) 
-				{
-					var spriteMaterial = getMaterialForLetter("1");
-					var sprite = new THREE.Sprite(spriteMaterial);
-					sprite.position.x = Math.random() * 800 - 400;
-					sprite.position.y = Math.random() * 800 - 400;
-					sprite.position.z = Math.random() * 800 - 400;
-					sprite.scale.x = sprite.scale.y = Math.random() * 20 + 20;
-					field.add(sprite); //textSprite
-				}
-				scene.add(field);
-
-				// Particles to represent the floor
-				var separation = 150;
-				var amountx = 10;
-				var amounty = 10;
-
-				var PI2 = Math.PI * 2;
-				var material = new THREE.SpriteCanvasMaterial( 
-					{
-					color: 0x0808080,
-					program: function ( context ) 
-					{
-						context.beginPath();
-						context.arc( 0, 0, 0.5, 0, PI2, true );
-						context.fill();
-					} } );
-
-				for ( var ix = 0; ix < amountx; ix++ ) 
-				{
-					for ( var iy = 0; iy < amounty; iy++ ) 
-					{
-						particle = new THREE.Sprite( material );
-						particle.position.x = ix * separation - ( ( amountx * separation ) / 2 );
-						particle.position.y = -153
-						particle.position.z = iy * separation - ( ( amounty * separation ) / 2 );
-						particle.scale.x = particle.scale.y = 2;
-						scene.add( particle );
-					}
-				}
-				
-				raycaster = new THREE.Raycaster(); 		//used for particles
 				mouse = new THREE.Vector2();			//used for particles
 				
 				renderer = new THREE.CanvasRenderer();
@@ -234,55 +212,6 @@
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
-			}
-			
-			// function provided by travnik from stack overflow.
-			function getMaterialForLetter(character)
-			{
-				var retMaterial = materialLUT[character];
-				if(retMaterial == void 0)
-				{
-			        var canvas = document.createElement('canvas');
-			        var context = image.getContext('2d');
-			        context.fillText(character, 2, 2);
-					context.font = 2+'px Monospace';
-			        var tex = new THREE.Texture(canvas);
-					tex.flipY = false;
-			        tex.needsUpdate = true;
-			        retMaterial = materialLUT[character] = new THREE.SpriteMaterial({ color: 0x000000, map: tex });
-			    }
-			    return retMaterial;
-				
-				
-				/*var fontSize = 16;
-				
-				// The square letter texture will have 16 * 16 = 256 letters, enough for all 8-bit characters.
-				var lettersPerSide = 16;
-				
-				var c = document.createElement('canvas');
-				c.width = c.height = fontSize*lettersPerSide;
-				var ctx = c.getContext('2d');
-				ctx.font = fontSize+'px Monospace';
-				
-				// This is a magic number for aligning the letters on rows. YMMV.
-				var yOffset = -0.25;
-				
-				// Draw all the letters to the canvas.
-				for (var i=0,y=0; y<lettersPerSide; y++) 
-				{
-					for (var x=0; x<lettersPerSide; x++,i++) 
-					{
-				    	var ch = String.fromCharCode(i);
-				    	ctx.fillText(ch, x*fontSize, yOffset*fontSize+(y+1)*fontSize);
-					}
-				}
-				
-				// Create a texture from the letter canvas.
-				var tex = new THREE.Texture(c);
-				// Tell Three.js not to flip the texture.
-				tex.flipY = false;
-				// And tell Three.js that it needs to update the texture.
-				tex.needsUpdate = true;*/
 			}
 
 			function onWindowResize() 
@@ -300,12 +229,8 @@
 			{
 				event.preventDefault();
 
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY ) * 0.2;
-
+				mouse.x = ( event.clientX - windowHalfX ); //was mouseX
+				mouse.y = ( event.clientY - windowHalfY ) * 0.2; //was mouseY
 			}
 			
 			//
@@ -322,19 +247,18 @@
 
 			function render() 
 			{
-				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.position.x += ( mouse.x - camera.position.x ) * 0.05; //was mouseX
+				camera.position.y += ( - mouse.y - camera.position.y ) * 0.05; //was mouseY
 				camera.lookAt( scene.position );
 				
-				camera.updateMatrixWorld(); //from particle camera
+				//camera.updateMatrixWorld(); //from particle camera
 
-				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-
+				if ( video.readyState === video.HAVE_ENOUGH_DATA ) 
+				{
 					imageContext.drawImage( video, 0, 0 );
 
 					if ( texture ) texture.needsUpdate = true;
 					if ( textureReflection ) textureReflection.needsUpdate = true;
-
 				}
 
 				imageReflectionContext.drawImage( image, 0, 0 );
@@ -345,6 +269,367 @@
 			}
 
 		</script>
+		
+		
+
+		<!--<script>
+
+			var container, stats;
+			var camera, scene, renderer, group, particle;
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera.position.z = 1000;
+
+				scene = new THREE.Scene();
+
+				var PI2 = Math.PI * 2;
+				var program = function ( context ) {
+
+					context.beginPath();
+					context.arc( 0, 0, 0.5, 0, PI2, true );
+					context.fill();
+
+				}
+				
+				var program0 = function ( context ) 
+				{
+					var fontSize = 2;
+					context.font = fontSize+'px Monospace';
+					context.fillText("0", fontSize, fontSize);
+				}
+				
+				var program1 = function ( context ) 
+				{
+					var fontSize = 2;
+					context.font = fontSize+'px Monospace';
+					context.fillText("1", fontSize, fontSize);
+				}
+
+				var texture = THREE.ImageUtils.loadTexture("img/1.png");
+				texture.flipY = false;
+				texture.needsUpdate = true;
+				
+				group = new THREE.Group();
+				scene.add( group );
+
+				/*var material = new THREE.SpriteCanvasMaterial( {
+						color: Math.random() * 0x808008 + 0x808080,
+						program: program1
+					} );*/
+				var material = new THREE.SpriteMaterial( {
+					map: texture,
+					transparent: true
+				} );
+
+				for ( var i = 0; i < 100; i++ ) {
+
+					
+
+					particle = new THREE.Sprite( material );
+					particle.position.x = Math.random() * 2000 - 1000;
+					particle.position.y = Math.random() * 2000 - 1000;
+					particle.position.z = Math.random() * 2000 - 1000;
+					particle.scale.x = particle.scale.y = Math.random() * 20 + 10;
+					//particle.scale.y *= -1;
+					group.add( particle );
+				}
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 ); //0xf0f0f0
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				if ( event.touches.length === 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+				}
+
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				if ( event.touches.length === 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.lookAt( scene.position );
+
+				//group.rotation.x += 0.01;
+				//group.rotation.y += 0.02;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>-->
+		
+		<!--<script>
+
+			var container, stats;
+			var camera, scene, renderer, particle;
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.z = 1000;
+
+				scene = new THREE.Scene();
+				
+				var texture = THREE.ImageUtils.loadTexture("img/1.png");
+				texture.needsUpdate = true;
+				texture.flipY = false;
+				
+				group = new THREE.Group();
+				scene.add( group );
+				
+				var material = new THREE.SpriteMaterial( {
+					map: texture,
+					transparent: true
+				} );
+
+				for ( var i = 0; i < 100; i++ ) {
+
+					particle = new THREE.Sprite( material );
+
+					initParticle( particle, i * 10 );
+
+					group.add( particle );
+				}
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0x000040 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function generateSprite() {
+
+				/*var canvas = document.createElement( 'canvas' );
+				canvas.width = 16;
+				canvas.height = 16;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0, 'rgba(255,255,255,1)' );
+				gradient.addColorStop( 0.2, 'rgba(0,255,255,1)' );
+				gradient.addColorStop( 0.4, 'rgba(0,0,64,1)' );
+				gradient.addColorStop( 1, 'rgba(0,0,0,1)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				return canvas;*/
+				
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 16;
+				canvas.height = 16;
+
+				var context = canvas.getContext( '2d' );
+				
+				var fontSize = 20;
+				context.font = fontSize+'px Monospace';
+				context.fillText("5", fontSize, fontSize);
+				
+				return canvas;
+			}
+
+			function initParticle( particle, delay ) {
+
+				var particle = this instanceof THREE.Sprite ? this : particle;
+				var delay = delay !== undefined ? delay : 0;
+
+				particle.position.set( 0, 0, 0 )
+				particle.scale.x = particle.scale.y = Math.random() * 32 + 16;
+
+				new TWEEN.Tween( particle )
+					.delay( delay )
+					.to( {}, 10000 )
+					.onComplete( initParticle )
+					.start();
+
+				new TWEEN.Tween( particle.position )
+					.delay( delay )
+					.to( { x: Math.random() * 4000 - 2000, y: Math.random() * 1000 - 500, z: Math.random() * 4000 - 2000 }, 10000 )
+					.start();
+
+				new TWEEN.Tween( particle.scale )
+					.delay( delay )
+					.to( { x: 0, y: 0 }, 10000 )
+					.start();
+
+			}
+
+			//
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+				}
+
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				TWEEN.update();
+
+				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>-->
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>

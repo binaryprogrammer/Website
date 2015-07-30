@@ -95,7 +95,12 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
-
+#play-pause {
+    /*background-image: url(img/play.png) no-repeat;*/
+    /*padding-left: 50px;*/
+    padding-right: 50px;
+    background-color: yellow;
+}
 
 
 

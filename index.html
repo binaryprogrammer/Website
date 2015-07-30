@@ -37,28 +37,26 @@
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
 
-		<video id="video" autoplay style="display:none">
+		<video id="video" style="display:none">
 			<source src="img/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 			<source src="img/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 			<p>Your browser doesn't support HTML5 video. Please download a browser from this century to view this site.</p>
 		</video>
 		
-		<button type="button" id="play-pause">Play</button>		<!-- Play pause button for the videos -->
-		<input type="range" id="seek" value="0">				<!-- Seek bar for the videos -->
-		<button type="button" id="mute">Mute</button>			<!-- Mute button for videos -->
-		
         <script>
 			
-			var container, stats;
+			var stats, displayStats = true;
+			var container;
 			var camera, scene, renderer;
 			var video, image, imageContext,
 			imageReflection, imageReflectionContext, imageReflectionGradient,
 			texture, textureReflection,
 			particles, particleSpeed, particleLifetime;
 
-			var videoMesh;
+			var videoMesh, playPauseMesh, volumeMesh, seekMesh;
+			var buttons = [ ];
 			
-			var mouse;
+			var mouse, raycaster;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -90,6 +88,7 @@
 				var material1 = new THREE.SpriteMaterial( { map: texture1, transparent: true } );
 				
 				particles = new THREE.Group();
+				//particles = new THREE.Object3D(); //Doesn't seem to affect speed any.
 				particleSpeed = [];
 				particleLifetime = [];
 				scene.add( particles );
@@ -152,18 +151,49 @@
 				materialReflection.opacity = .8;
 
 				// Create a plane to project the video onto.
-				var plane = new THREE.PlaneGeometry( 480, 204, 4, 4 );
+				var videoGeom = new THREE.PlaneGeometry(480, 204, 4, 4);
 
-				videoMesh = new THREE.Mesh( plane, material );
+				videoMesh = new THREE.Mesh( videoGeom, material );
 				videoMesh.scale.x = videoMesh.scale.y = videoMesh.scale.z = 1.5;
 				scene.add(videoMesh);
 
-				videoMesh = new THREE.Mesh( plane, materialReflection );
+				videoMesh = new THREE.Mesh( videoGeom, materialReflection );
 				videoMesh.position.y = -306;
 				videoMesh.rotation.x = - Math.PI;
 				videoMesh.scale.x = videoMesh.scale.y = videoMesh.scale.z = 1.5;
 				scene.add( videoMesh );
-
+				
+				THREE.ImageUtils.loadTexture("img/Pause.png");
+				var playTex = THREE.ImageUtils.loadTexture("img/Play.png");
+				playTex.flipY = true;
+				playTex.needsUpdate = true;
+				
+				var playMat = new THREE.MeshBasicMaterial( { map: playTex, transparent: true, overdraw: 0.5 } );
+				
+				var playPauseGeom = new THREE.PlaneGeometry(50, 50, 1, 1);
+				playPauseMesh = new THREE.Mesh(playPauseGeom, playMat);
+				playPauseMesh.position.y = -140;
+				playPauseMesh.position.x = -200;
+				playPauseMesh.position.z += 300;
+				buttons.push(playPauseMesh);
+				scene.add(playPauseMesh);
+				
+				THREE.ImageUtils.loadTexture( 'img/Mute.png' );
+				var volumeTex = THREE.ImageUtils.loadTexture("img/Unmute.png");
+				volumeTex.flipY = true;
+				volumeTex.needsUpdate = true;
+				
+				var volumeMat = new THREE.MeshBasicMaterial( { map: volumeTex, transparent: true, overdraw: 0.5 } );
+				
+				var volumeGeom = new THREE.PlaneGeometry(50, 50, 1, 1);
+				volumeMesh = new THREE.Mesh(playPauseGeom, volumeMat);
+				volumeMesh.position.y = -140;
+				volumeMesh.position.x = 200;
+				volumeMesh.position.z += 240;
+				buttons.push(volumeMesh);
+				scene.add(volumeMesh);
+				
+				raycaster = new THREE.Raycaster();
 				mouse = new THREE.Vector2();			//used for camera movement
 				
 				renderer = new THREE.CanvasRenderer();
@@ -171,20 +201,24 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				
+				if (displayStats)
+				{
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					container.appendChild( stats.domElement );
+				}
+				
 				//TODO: add touch move listener
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
 			
-			function loadVideos()
+			function loadVideos() //TODO: call this when I want to display the videos
 			{
-				
+				//TODO: add video and buttons to the scene.
 			}
 			
 			function onWindowResize() 
@@ -206,13 +240,83 @@
 				mouse.y = ( event.clientY - windowHalfY ) * 0.8; //was mouseY
 			}
 			
+			function onDocumentMouseDown( event ) 
+			{
+				event.preventDefault();
+
+				var clicked = new THREE.Vector2(); //Where the user clicked in 3d space.
+				clicked.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+				clicked.y = -( event.clientY / renderer.domElement.height ) * 2 + 1;
+
+				raycaster.setFromCamera( clicked, camera );
+
+				var intersects = raycaster.intersectObjects( buttons );
+
+				if ( intersects.length > 0 ) 
+				{
+					var intersect = intersects[ 0 ];
+					
+					if ( intersect.object == playPauseMesh ) 
+					{
+						if (video.paused == true) //TODO: fix bug where when the video finishes the pause button doesn't switch to play.
+						{
+							// Play the video
+							video.play();
+							
+							// Update the button text to 'Pause'
+							playPauseMesh.material.map = THREE.ImageUtils.loadTexture( 'img/Pause.png' );
+							playPauseMesh.material.needsUpdate = true;
+							playPauseMesh.position.z -= 50;
+						} 
+						else 
+						{
+							// Pause the video
+							video.pause();
+							
+							// Update the button text to 'Play'
+							playPauseMesh.material.map = THREE.ImageUtils.loadTexture( 'img/Play.png' );
+							playPauseMesh.material.needsUpdate = true;
+							playPauseMesh.position.z += 50;
+						}
+					}
+					else if (intersect.object == volumeMesh)
+					{
+						if (video.muted == false) 
+						{
+							// Mute the video
+							video.muted = true;
+							
+							// Update the button text
+							volumeMesh.material.map = THREE.ImageUtils.loadTexture( 'img/Mute.png' );
+							volumeMesh.material.needsUpdate = true;
+							volumeMesh.position.z -= 50;
+						} 
+						else 
+						{
+							// Unmute the video
+							video.muted = false;
+							
+							// Update the button text
+							volumeMesh.material.map = THREE.ImageUtils.loadTexture( 'img/Unmute.png' );
+							volumeMesh.material.needsUpdate = true;
+							volumeMesh.position.z += 50;
+						}
+					}
+					else if (intersects.object == seekMesh)
+					{
+						
+					}
+				}
+			}
+			
 			//
 			function animate() 
 			{
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
+				if (displayStats)
+					stats.update();
 			}
 
 			var radius = 600;

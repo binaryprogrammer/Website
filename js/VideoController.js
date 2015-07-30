@@ -1,63 +1,14 @@
-
-
-window.onload = function() 
-{
-  // Video
-  var video = document.getElementById("video");
   
-  // Buttons
-  var playButton = document.getElementById("play-pause");
-  var muteButton = document.getElementById("mute");
   
-  // Sliders
-  var seekBar = document.getElementById("seek");
-  
-  // Event listener for the play/pause button
-  playButton.addEventListener("click", function() 
-  {
-    if (video.paused == true) 
-    {
-      // Play the video
-      video.play();
-    
-      // Update the button text to 'Pause'
-      playButton.innerHTML = "Pause";
-    } 
-    else 
-    {
-      // Pause the video
-      video.pause();
-    
-      // Update the button text to 'Play'
-      playButton.innerHTML = "Play";
-    }
-  });
-  
-  // Event listener for the mute button
-  muteButton.addEventListener("click", function() {
-  if (video.muted == false) {
-  // Mute the video
-  video.muted = true;
-  
-  // Update the button text
-  muteButton.innerHTML = "Unmute";
-  } else {
-  // Unmute the video
-  video.muted = false;
-  
-  // Update the button text
-  muteButton.innerHTML = "Mute";
-  }
-  });
   
   // Event listener for the seek bar
-  seekBar.addEventListener("change", function() {
+seekBar.addEventListener("change", function() {
   // Calculate the new time
   var time = video.duration * (seekBar.value / 100);
-  
+
   // Update the video time
   video.currentTime = time;
-  });
+});
   
   // Update the seek bar as the video plays
   video.addEventListener("timeupdate", function() {
@@ -77,6 +28,3 @@ window.onload = function()
   seekBar.addEventListener("mouseup", function() {
   video.play();
   });
-
-}
-

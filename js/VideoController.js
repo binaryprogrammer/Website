@@ -1,6 +1,6 @@
   
   
-  
+  /*
   // Event listener for the seek bar
 seekBar.addEventListener("change", function() {
   // Calculate the new time
@@ -27,4 +27,4 @@ seekBar.addEventListener("change", function() {
   // Play the video when the slider handle is dropped
   seekBar.addEventListener("mouseup", function() {
   video.play();
-  });
+  });*/

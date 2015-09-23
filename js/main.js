@@ -45,9 +45,12 @@ function onDocumentMouseDown( event )
     clicked.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
     clicked.y = -( event.clientY / renderer.domElement.height ) * 2 + 1;
 
+    //console.log("on Mouse Down");
+
     raycaster.setFromCamera( clicked, camera );
     
     checkMouseAgainstButtons(raycaster);
+    checkMouseAgainstLinks(raycaster);
 }
 
 function checkMouseAgainstButtons(raycaster)
@@ -118,18 +121,60 @@ function checkMouseAgainstLinks(raycaster)
     if ( intersects.length > 0 ) 
     {
         var intersect = intersects[ 0 ];
-        
-        if ( intersect.object == playPauseMesh ) 
+
+        if ( intersect.object == homeMesh ) 
         {
-            
+            console.log("home clicked");
+            hideVideos();
+            hideResume();
+            //TODO: clear display
         }
-        else if (intersect.object == volumeMesh)
+        else if (intersect.object == gamesMesh)
         {
-            
+            console.log("games clicked");
+            displayVideos();
+            hideResume();
+            //TODO: display games and videos
         }
-        else if (intersects.object == seekMesh)
+        else if (intersect.object == bioMesh)
         {
-            
+            console.log("bio clicked");
+            hideVideos();
+            hideResume();
+            //TODO: display bio
+        }
+        else if (intersect.object == resumeMesh)
+        {
+            console.log("resume clicked");
+            hideVideos();
+            showResume();
+            //TODO: display resume
+        }
+        else if (intersect.object == linkedInMesh)
+        {
+            console.log("linkedIn clicked");
+            hideVideos();
+            hideResume();
+            //TODO: open linkedIn in new window
+        }
+        else if (intersect.object == twitterMesh)
+        {
+            console.log("twitter clicked");
+            hideVideos();
+            hideResume();
+            //TODO: open twitter in new window
+        }
+        else if (intersect.object == gitHubMesh)
+        {
+            console.log("github clicked");
+            hideVideos();
+            hideResume();
+            //TODO: open github in new window
+        }
+        else if (intersect.object == playInfinityMesh || intersect.object == infinityMesh)
+        {
+            console.log("play Infinity");
+            //TODO: open infinity in new window
         }
     }
 }
@@ -157,7 +202,7 @@ function render()
     camera.updateMatrixWorld(); //from particle camera
     
     //TODO: move the particles down and fade them out.
-    /*for ( var i = 0; i < particles.children.length; i++) 
+    for ( var i = 0; i < particles.children.length; i++) 
     {
         particles.children[i].position.y -= particleSpeed[i];
         if (particles.children[i].position.y < -window.innerHeight)
@@ -165,7 +210,7 @@ function render()
             particles.position.y = window.innerHeight;
         }
     }
-    particles.rotation.y += .0001;*/
+    particles.rotation.y += .0001;
 
     if ( video.readyState === video.HAVE_ENOUGH_DATA ) 
     {

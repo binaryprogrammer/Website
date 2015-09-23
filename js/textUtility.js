@@ -1,22 +1,3 @@
-//I don't think this function works, but I was in a rush writing this site I didn't make any comments. 
-function generateSprite() 
-{
-    var canvas = document.createElement( 'canvas' );
-    canvas.width = 16;
-    canvas.height = 16;
-
-    var context = canvas.getContext( '2d' );
-    var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
-    gradient.addColorStop( 0, 'rgba(255,255,255,1)' );
-    gradient.addColorStop( 0.2, 'rgba(0,255,255,1)' );
-    gradient.addColorStop( 0.4, 'rgba(0,0,64,1)' );
-    gradient.addColorStop( 1, 'rgba(0,0,0,1)' );
-
-    context.fillStyle = gradient;
-    context.fillRect( 0, 0, canvas.width, canvas.height );
-
-    return canvas;
-}
 
 //Makes a sprite with the given message and returns it. Returned text is static    
 function makeTextSprite( message, parameters )
@@ -35,16 +16,15 @@ function makeTextSprite( message, parameters )
     context.font = "Bold " + fontsize + "px " + fontface;
     
     // get size data (height depends only on font size)
-    var metrics = context.measureText( message );
-    var textWidth = metrics.width;
+    //var metrics = context.measureText( message );
+    //var textWidth = metrics.width;
     
     // text color
     context.fillStyle = "rgba(0, 0, 0, 1.0)";
-    
-    context.fillText( message, fontsize, fontsize);
+    context.fillText( "There won't be much text displayed here but i'm trying to get everything displayed", -100, 128);
     
     // canvas contents will be used for a texture
-    var texture = new THREE.Texture(canvas) 
+    var texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
     
     var spriteMaterial = new THREE.SpriteMaterial( 
@@ -57,7 +37,7 @@ function makeTextSprite( message, parameters )
     return sprite;
 }
 
-function makeLink(message, paramaters)
+function makeLink(message, parameters, x, y, z)
 {
     if ( parameters === undefined ) 
         parameters = {};
@@ -77,20 +57,30 @@ function makeLink(message, paramaters)
     var textWidth = metrics.width;
     
     // text color
-    context.fillStyle = "rgba(0, 0, 0, 1.0)";
-    
+    context.fillStyle = "rgba(0, 0, 0, 1.0)"; //Black
     context.fillText( message, fontsize, fontsize);
     
     // canvas contents will be used for a texture
-    var texture = new THREE.Texture(canvas) 
+    var texture = new THREE.Texture(canvas); 
     texture.needsUpdate = true;
     
-    var spriteMaterial = new THREE.SpriteMaterial( 
-    { map: texture, useScreenCoordinates: false } ); 
+    var spriteMaterial = new THREE.SpriteMaterial( { map: texture, useScreenCoordinates: false } ); 
     
     var sprite = new THREE.Sprite( spriteMaterial );
     sprite.scale.set(100,50,1.0);
+    sprite.position.set(x, y, z);
+
+    var geom = new THREE.PlaneGeometry(textWidth/300, fontsize/150, 1, 1);
+    var mesh = new THREE.Mesh( geom, spriteMaterial );
+    mesh.scale.set(100,50,1.0);
+    mesh.position.set(x+textWidth/20,y+fontsize/10,z);
+    mesh.name = message;
+    mesh.visible = false;
     
+    links.push(mesh);
+    scene.add(mesh);
+    //sprite.add(mesh);
     scene.add(sprite);
-    return sprite;
+    
+    return mesh; //return the mesh so we can store it to check against it later.
 }

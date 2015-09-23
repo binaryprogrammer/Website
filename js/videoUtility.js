@@ -1,25 +1,22 @@
-//TODO: call this when I want to display the videos
+//call this when I want to display the videos
 function loadVideos()
 {
     texture = new THREE.Texture( image );
 
     imageReflection = document.createElement( 'canvas' );
-    imageReflection.width = 720; //480
-    imageReflection.height = 480; //204
+    imageReflection.width = 720;
+    imageReflection.height = 480;
 
     imageReflectionContext = imageReflection.getContext( '2d' );
     imageReflectionContext.fillStyle = '#000000';
-    imageReflectionContext.fillRect( 0, 0, 720, 480 ); //imageReflectionContext.fillRect( 0, 0, 480, 204 );
+    imageReflectionContext.fillRect( 0, 0, 720, 480 ); 
 
-    imageReflectionGradient = imageReflectionContext.createLinearGradient( 0, 0, 0, 480 ); //imageReflectionGradient = imageReflectionContext.createLinearGradient( 0, 0, 0, 204 );
-    imageReflectionGradient.addColorStop( 0.2, 'rgba(360, 360, 360, 1)' ); //imageReflectionGradient.addColorStop( 0.2, 'rgba(240, 240, 240, 1)' );
-    imageReflectionGradient.addColorStop( 1, 'rgba(360, 360, 360, 0.8)' ); //imageReflectionGradient.addColorStop( 1, 'rgba(240, 240, 240, 0.8)' );
+    imageReflectionGradient = imageReflectionContext.createLinearGradient( 0, 0, 0, 480 ); 
+    imageReflectionGradient.addColorStop( 0.2, 'rgba(360, 360, 360, 1)' ); 
+    imageReflectionGradient.addColorStop( 1, 'rgba(360, 360, 360, 0.8)' ); 
 
     textureReflection = new THREE.Texture( imageReflection );
-}
 
-function displayVideos() //TODO: fix all hard coded values to fit multiple screen resolutions.
-{
     var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
     
     //TODO: polish the movie reflection
@@ -28,17 +25,15 @@ function displayVideos() //TODO: fix all hard coded values to fit multiple scree
     materialReflection.opacity = .8;
 
     // Create a plane to project the video onto.
-    var videoGeom = new THREE.PlaneGeometry(480, 204, 4, 4); //var videoGeom = new THREE.PlaneGeometry(480, 204, 4, 4);
+    var videoGeom = new THREE.PlaneGeometry(480, 204, 4, 4);
 
     videoMesh = new THREE.Mesh( videoGeom, material );
     videoMesh.scale.x = videoMesh.scale.y = videoMesh.scale.z = 1.5;
-    scene.add(videoMesh);
 
-    videoMesh = new THREE.Mesh( videoGeom, materialReflection );
-    videoMesh.position.y = -306; //-306;
-    videoMesh.rotation.x = - Math.PI;
-    videoMesh.scale.x = videoMesh.scale.y = videoMesh.scale.z = 1.5;
-    scene.add( videoMesh );
+    reflectionMesh = new THREE.Mesh( videoGeom, materialReflection );
+    reflectionMesh.position.y = -306; //-306;
+    reflectionMesh.rotation.x = - Math.PI;
+    reflectionMesh.scale.x = reflectionMesh.scale.y = reflectionMesh.scale.z = 1.5;
     
     var playTex = THREE.ImageUtils.loadTexture("img/Play.png");
     playTex.flipY = true;
@@ -51,8 +46,6 @@ function displayVideos() //TODO: fix all hard coded values to fit multiple scree
     playPauseMesh.position.y = -140;
     playPauseMesh.position.x = -200;
     playPauseMesh.position.z += 300;
-    buttons.push(playPauseMesh);
-    scene.add(playPauseMesh);
     
     var volumeTex = THREE.ImageUtils.loadTexture("img/Unmute.png");
     volumeTex.flipY = true;
@@ -65,6 +58,37 @@ function displayVideos() //TODO: fix all hard coded values to fit multiple scree
     volumeMesh.position.y = -140;
     volumeMesh.position.x = 200;
     volumeMesh.position.z += 240;
-    buttons.push(volumeMesh);
-    scene.add(volumeMesh);
 }
+
+function hideVideos()
+{
+    video.pause();
+    playPauseMesh.material.map = THREE.ImageUtils.loadTexture( 'img/Play.png' );
+    playPauseMesh.material.needsUpdate = true;
+    playPauseMesh.position.z += 50;
+
+    scene.remove(videoMesh);
+    scene.remove(reflectionMesh);
+    scene.remove(playPauseMesh);
+    buttons.pop(playPauseMesh);
+    scene.remove(volumeMesh);
+    buttons.pop(volumeMesh);
+}
+
+function displayVideos() //TODO: fix all hard coded values to fit multiple screen resolutions.
+{
+    scene.add(videoMesh);
+    scene.add(reflectionMesh);
+    scene.add(playPauseMesh);
+    buttons.push(playPauseMesh);
+    scene.add(volumeMesh);
+    buttons.push(volumeMesh);
+
+    //playInfinityMesh = makeLink( " Play ", { fontsize: 64 }, 100, windowHalfY - 75, 400);
+    //infinityMesh = makeLink( " Infinity ", { fontsize: 64 }, 160, windowHalfY - 75, 410);
+}
+
+
+
+
+

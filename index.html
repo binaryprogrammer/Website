@@ -37,6 +37,7 @@
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
         <script src="js/textUtility.js"></script>
+        <script src="js/ImageUtility.js"></script>
         <script src="js/videoUtility.js"></script>
         <script src="js/background.js"></script>
 
@@ -55,8 +56,9 @@
 			texture, textureReflection,
 			particles, particleSpeed, particleLifetime;
 
-			var videoMesh, playPauseMesh, volumeMesh, seekMesh;
-			var gamesMesh;
+			var videoMesh, reflectionMesh, playPauseMesh, volumeMesh, seekMesh;
+			var homeMesh, gamesMesh, bioMesh, resumeMesh, linkedInMesh, twitterMesh, gitHubMesh;
+			var playInfinityMesh, infinityMesh;
 			var buttons = [ ];
 			var links = [ ];
 			
@@ -70,7 +72,10 @@
 			animate();
 			
 			function init() //TODO: fix all hard coded values to fit multiple screen resolutions.
-			{	
+			{
+				THREE.ImageUtils.loadTexture("img/square.png");
+				camTarget = new THREE.Vector3(); //defalut camera target placed at the start of the first function so anywhere else I decide to assign to camTarget will override the value for camTarget and the camera will look at the new target.
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -79,18 +84,17 @@
 
 				scene = new THREE.Scene();
 				
-				var spritey = makeTextSprite( " Update coming ", 
-					{ fontsize: 64 } );
+				var spritey = makeTextSprite( " Update coming ", { fontsize: 64 } );
 				spritey.position.set(-85,105,550);
 			
-				var spritey = makeTextSprite( " soon! ", 
-					{ fontsize: 64 } );
+				spritey = makeTextSprite( " soon! ", { fontsize: 64 } );
 				spritey.position.set(0,105,600);
 				
+				createNavigationBar(); //Creates the links on the top of the screen.
 				createBackgroundParticles(); //create the binary particles in the background.
 				
 				video = document.getElementById( 'video' );
-
+                
 				//Pre-load the video assets.
 				THREE.ImageUtils.loadTexture("img/Play.png");
 				THREE.ImageUtils.loadTexture("img/Pause.png");
@@ -98,8 +102,8 @@
 				THREE.ImageUtils.loadTexture("img/Unmute.png");
 				
 				image = document.createElement( 'canvas' );
-				image.width = 720; //480
-				image.height = 480; //204
+				image.width = 720; 
+				image.height = 480;
 
 				imageContext = image.getContext( '2d' );
 				imageContext.fillStyle = '#0000dd';
@@ -107,7 +111,6 @@
 				
 				raycaster = new THREE.Raycaster();
 				mouse = new THREE.Vector2();			//used for camera movement
-				camTarget = new THREE.Vector3();
 				
 				//if ( webglAvailable() ) //TODO: Make the site compatible with WebGL and Canvas.
 				//{
@@ -119,7 +122,7 @@
 				//}
 				
 				loadVideos();
-                displayVideos();
+                //displayVideos();
 				
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xf0f0f0 ); //f0f0f0 //TODO: return this to the original color.
@@ -139,6 +142,17 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function createNavigationBar()
+			{
+				homeMesh = makeLink( " home ", { fontsize: 64 }, -500, windowHalfY - 32, -50);
+				gamesMesh = makeLink( " games ", { fontsize: 64 }, -400, windowHalfY - 32, -50);
+				resumeMesh = makeLink (" resume ", { fontsize: 64 }, -300, windowHalfY - 32, -50);
+				bioMesh = makeLink(" bio ", { fontsize: 64 }, -200, windowHalfY - 32, -50);
+				linkedInMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/square.png"), 100, windowHalfY-32, 0);
+				twitterMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/square.png"), -100, windowHalfY - 32, -50);
+				gitHubMesh = makePictureLink(THREE.ImageUtils.loadTexture("img/square.png"), 0, windowHalfY - 32, -50);
 			}
 
 		</script>

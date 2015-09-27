@@ -28,8 +28,10 @@
 		<script src="js/VideoController.js"></script>
 		
         <script src="js/vendor/three.min.js"></script>			<!-- three.js minnified js library -->
-		<script src="js/vendor/Projector.js"></script>			<!-- Camera helper class -->
-		<script src="js/vendor/CanvasRenderer.js"></script>		<!-- Renderer for Canvas -->
+
+		<script src="js/vendor/renderers/Projector.js"></script>			<!-- Camera helper class -->
+		<script src="js/vendor/renderers/CanvasRenderer.js"></script>		<!-- Renderer for Canvas -->
+
 		<script src="js/vendor/Detector.js"></script> 			<!-- Detects if HTML5 is supported in browser -->
 		<script src="js/vendor/tween.min.js"></script>			<!-- Tween helper script -->
 		<script src="js/vendor/stats.min.js"></script>			<!-- Debug script for three.js -->
@@ -40,12 +42,18 @@
         <script src="js/ImageUtility.js"></script>
         <script src="js/videoUtility.js"></script>
         <script src="js/background.js"></script>
+        <script src="js/resume.js"></script>
+        <script src="js/games.js"></script>
+        <script src="js/bio.js"></script>
+
+        <script src="fonts/helvetiker_bold.typeface.js"></script>
+        <script src="fonts/helvetiker_regular.typeface.js"></script>
 
 		<video id="video" style="display:none">
-			<source src="img/DemoReel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+			<source src="video/DemoReel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 			<p>Your browser doesn't support HTML5 video. Please download a browser from this century to view this site.</p>
 		</video>
-		
+
         <script>
 			
 			var stats, displayStats = true; //variables for debugging
@@ -53,8 +61,7 @@
 			var camera, camTarget, scene, renderer; //variables for the page
 			var video, image, imageContext,
 			imageReflection, imageReflectionContext, imageReflectionGradient,
-			texture, textureReflection,
-			particles, particleSpeed, particleLifetime;
+			texture, textureReflection;
 
 			var videoMesh, reflectionMesh, playPauseMesh, volumeMesh, seekMesh;
 			var homeMesh, gamesMesh, bioMesh, resumeMesh, linkedInMesh, twitterMesh, gitHubMesh;
@@ -66,6 +73,8 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+
+			var textShapes = [];
 			
 			//
 			init();
@@ -81,18 +90,19 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.set( 0, 0, 1000 );
+				camera.updateMatrixWorld(); //Must be called after change of parameters
 
 				scene = new THREE.Scene();
 				
-				var spritey = makeTextSprite( " Update coming ", { fontsize: 64 } );
-				spritey.position.set(-85,105,550);
-			
-				spritey = makeTextSprite( " soon! ", { fontsize: 64 } );
-				spritey.position.set(0,105,600);
-				
+				initResume();
+				initBio();
+				initGames();
+				loadVideos();
+                //displayVideos();
 				createNavigationBar(); //Creates the links on the top of the screen.
 				createBackgroundParticles(); //create the binary particles in the background.
-				
+				displayBackgroundLogo();
+
 				video = document.getElementById( 'video' );
                 
 				//Pre-load the video assets.
@@ -101,30 +111,21 @@
 				THREE.ImageUtils.loadTexture( 'img/Mute.png' );
 				THREE.ImageUtils.loadTexture("img/Unmute.png");
 				
-				image = document.createElement( 'canvas' );
-				image.width = 720; 
-				image.height = 480;
-
-				imageContext = image.getContext( '2d' );
-				imageContext.fillStyle = '#0000dd';
-				imageContext.fillRect( 0, 0, 720, 480 ); //imageContext.fillRect( 0, 0, 480, 204 );
-				
 				raycaster = new THREE.Raycaster();
 				mouse = new THREE.Vector2();			//used for camera movement
 				
-				//if ( webglAvailable() ) //TODO: Make the site compatible with WebGL and Canvas.
-				//{
-				//	renderer = new THREE.WebGLRenderer();
-				//} 
-				//else 
-				//{
-				//	renderer = new THREE.CanvasRenderer();
-				//}
-				
-				loadVideos();
-                //displayVideos();
-				
-				renderer = new THREE.CanvasRenderer();
+				/*if ( webglAvailable() ) //TODO: Make the site compatible with WebGL and Canvas.
+				{
+					console.log("Renderer set to WebGL");
+					renderer = new THREE.WebGLRenderer();
+				} 
+				else 
+				{
+					console.log("Renderer set to Canvas");
+					renderer = new THREE.CanvasRenderer();
+				}*/
+
+				renderer = new THREE.WebGLRenderer({antialias: true}); //Displaying text requires webGL for uv coordinates
 				renderer.setClearColor( 0xf0f0f0 ); //f0f0f0 //TODO: return this to the original color.
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -146,13 +147,17 @@
 
 			function createNavigationBar()
 			{
-				homeMesh = makeLink( " home ", { fontsize: 64 }, -500, windowHalfY - 32, -50);
-				gamesMesh = makeLink( " games ", { fontsize: 64 }, -400, windowHalfY - 32, -50);
-				resumeMesh = makeLink (" resume ", { fontsize: 64 }, -300, windowHalfY - 32, -50);
-				bioMesh = makeLink(" bio ", { fontsize: 64 }, -200, windowHalfY - 32, -50);
-				linkedInMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/square.png"), 100, windowHalfY-32, 0);
-				twitterMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/square.png"), -100, windowHalfY - 32, -50);
-				gitHubMesh = makePictureLink(THREE.ImageUtils.loadTexture("img/square.png"), 0, windowHalfY - 32, -50);
+				homeMesh = makeLink( " home ", { fontsize: 64 }, -windowHalfX + 100, windowHalfY - 32, -50);
+				gamesMesh = makeLink( " games ", { fontsize: 64 }, -windowHalfX + 200, windowHalfY - 32, -50);
+				resumeMesh = makeLink (" resume ", { fontsize: 64 }, -windowHalfX + 300, windowHalfY - 32, -50);
+				bioMesh = makeLink(" bio ", { fontsize: 64 }, -windowHalfX + 400, windowHalfY - 32, -50);
+
+				twitterMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/twitter.png"), 
+					windowHalfX - 140, windowHalfY - 64, -50, 35, 35);
+				gitHubMesh = makePictureLink(THREE.ImageUtils.loadTexture("img/githubIcon.png"), 
+					windowHalfX - 100, windowHalfY - 64, -50, 35, 35);
+				linkedInMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/linkedin.png"), 
+					windowHalfX - 60, windowHalfY - 64, -50, 30, 30);
 			}
 
 		</script>

@@ -125,51 +125,45 @@ function checkMouseAgainstLinks(raycaster)
         if ( intersect.object == homeMesh ) 
         {
             console.log("home clicked");
-            hideVideos();
-            hideResume();
-            //TODO: clear display
+            hideAll();
         }
         else if (intersect.object == gamesMesh)
         {
             console.log("games clicked");
-            displayVideos();
-            hideResume();
-            //TODO: display games and videos
+            hideAll();
+            displayGames();
         }
         else if (intersect.object == bioMesh)
         {
             console.log("bio clicked");
-            hideVideos();
-            hideResume();
-            //TODO: display bio
+            hideAll();
+            showBio();
         }
         else if (intersect.object == resumeMesh)
         {
             console.log("resume clicked");
-            hideVideos();
+            hideAll();
             showResume();
             //TODO: display resume
+        }
+        else if (intersect.object == pdfMesh)
+        {
+            window.open("/downloads/Nathan_Moore_Resume.pdf");
         }
         else if (intersect.object == linkedInMesh)
         {
             console.log("linkedIn clicked");
-            hideVideos();
-            hideResume();
-            //TODO: open linkedIn in new window
+            window.open("https://www.linkedin.com/in/binaryprogrammer");
         }
         else if (intersect.object == twitterMesh)
         {
             console.log("twitter clicked");
-            hideVideos();
-            hideResume();
-            //TODO: open twitter in new window
+            window.open("https://twitter.com/binaryprogramer");
         }
         else if (intersect.object == gitHubMesh)
         {
             console.log("github clicked");
-            hideVideos();
-            hideResume();
-            //TODO: open github in new window
+            window.open("https://github.com/binaryprogrammer");
         }
         else if (intersect.object == playInfinityMesh || intersect.object == infinityMesh)
         {
@@ -179,50 +173,67 @@ function checkMouseAgainstLinks(raycaster)
     }
 }
 
+function hideAll()
+{
+    hideGames();
+    hideResume();
+    hideBio();
+}
+
 //
 function animate() 
 {
-    requestAnimationFrame( animate );
+    //setTimeout( function() {
+        if ( !document.webkitHidden ) 
+            requestAnimationFrame( animate ); //requestAnimationFrame( animate ); //Was
+    //}, 1000 / 30 ); //30fps
 
     render();
     if (displayStats)
         stats.update();
 }
 
-var radius = 600;
-var theta = 0;
-
 function render() 
 {
     camera.position.x += ( mouse.x - camera.position.x ) * 0.05; //was mouseX
     camera.position.y += ( - mouse.y - camera.position.y ) * 0.05; //was mouseY
-    //camera.lookAt( scene.position );
     camera.lookAt(camTarget);
-    
-    camera.updateMatrixWorld(); //from particle camera
     
     //TODO: move the particles down and fade them out.
     for ( var i = 0; i < particles.children.length; i++) 
     {
-        particles.children[i].position.y -= particleSpeed[i];
-        if (particles.children[i].position.y < -window.innerHeight)
+        particles.children[i].position.y -= particleSpeed[i]/2;
+        particles.children[i].material.opacity -= particleFade[i];
+        if (particles.children[i].material.opacity <= 0)
         {
-            particles.position.y = window.innerHeight;
+            //particles.children[i].position.y += window.innerHeight/4;
+            particles.children[i].position.x = Math.random() * window.innerWidth * 2 - window.innerWidth;
+            particles.children[i].position.y = Math.random() * window.innerHeight * 2 - window.innerHeight;
+            particles.children[i].position.z = Math.random() * 1800 - 1000;
+            particleFade[i] *= -1;
+        }
+        else if (particles.children[i].material.opacity>= 1)
+        {
+            particleFade[i] *= -1;
         }
     }
-    particles.rotation.y += .0001;
+    //particles.rotation.y += .0001;
 
-    if ( video.readyState === video.HAVE_ENOUGH_DATA ) 
+    if (imageReflectionContext != null)
     {
-        imageContext.drawImage( video, 0, 0 );
+        if ( video.readyState === video.HAVE_ENOUGH_DATA ) 
+        {
+            imageContext.drawImage( video, 0, 0 );
 
-        if ( texture ) texture.needsUpdate = true;
-        if ( textureReflection ) textureReflection.needsUpdate = true;
+            if ( texture ) texture.needsUpdate = true;
+            if ( textureReflection ) textureReflection.needsUpdate = true;
+        }
+
+        imageReflectionContext.drawImage( image, 0, 0 );
+        imageReflectionContext.fillStyle = imageReflectionGradient;
+        imageReflectionContext.fillRect( 0, 0, 720, 480 ); //imageReflectionContext.fillRect( 0, 0, 480, 204 );
     }
 
-    imageReflectionContext.drawImage( image, 0, 0 );
-    imageReflectionContext.fillStyle = imageReflectionGradient;
-    imageReflectionContext.fillRect( 0, 0, 720, 480 ); //imageReflectionContext.fillRect( 0, 0, 480, 204 );
-
     renderer.render( scene, camera );
+    //requestAnimationFrame(animate, renderer.domElement);
 }

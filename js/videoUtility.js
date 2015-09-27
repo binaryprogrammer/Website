@@ -1,6 +1,14 @@
 //call this when I want to display the videos
 function loadVideos()
 {
+    image = document.createElement( 'canvas' );
+    image.width = 720; 
+    image.height = 480;
+
+    imageContext = image.getContext( '2d' );
+    imageContext.fillStyle = '#0000dd';
+    imageContext.fillRect( 0, 0, 720, 480 ); //imageContext.fillRect( 0, 0, 480, 204 );
+                
     texture = new THREE.Texture( image );
 
     imageReflection = document.createElement( 'canvas' );
@@ -62,6 +70,9 @@ function loadVideos()
 
 function hideVideos()
 {
+    if (playPauseMesh === undefined)
+        return;
+
     video.pause();
     playPauseMesh.material.map = THREE.ImageUtils.loadTexture( 'img/Play.png' );
     playPauseMesh.material.needsUpdate = true;

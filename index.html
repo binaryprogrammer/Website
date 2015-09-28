@@ -39,7 +39,7 @@
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
         <script src="js/textUtility.js"></script>
-        <script src="js/ImageUtility.js"></script>
+        <script src="js/imageUtility.js"></script>
         <script src="js/videoUtility.js"></script>
         <script src="js/background.js"></script>
         <script src="js/resume.js"></script>
@@ -147,16 +147,20 @@
 
 			function createNavigationBar()
 			{
-				homeMesh = makeLink( " home ", { fontsize: 64 }, -windowHalfX + 100, windowHalfY - 32, -50);
-				gamesMesh = makeLink( " games ", { fontsize: 64 }, -windowHalfX + 200, windowHalfY - 32, -50);
-				resumeMesh = makeLink (" resume ", { fontsize: 64 }, -windowHalfX + 300, windowHalfY - 32, -50);
-				bioMesh = makeLink(" bio ", { fontsize: 64 }, -windowHalfX + 400, windowHalfY - 32, -50);
+				homeMesh = displayLink(" home ");
+				homeMesh.position.set(-windowHalfX + 100, windowHalfY - 32, 100);
+				gamesMesh = displayLink(" games ");
+				gamesMesh.position.set(-windowHalfX + 200, windowHalfY - 32, 100);
+				resumeMesh = displayLink (" resume ");
+				resumeMesh.position.set(-windowHalfX + 300, windowHalfY - 32, 100);
+				bioMesh = displayLink(" bio ");
+				bioMesh.position.set(-windowHalfX + 400, windowHalfY - 32, 100);
 
-				twitterMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/twitter.png"), 
+				twitterMesh = displayPictureLink (THREE.ImageUtils.loadTexture("img/twitter.png"), 
 					windowHalfX - 140, windowHalfY - 64, -50, 35, 35);
-				gitHubMesh = makePictureLink(THREE.ImageUtils.loadTexture("img/githubIcon.png"), 
+				gitHubMesh = displayPictureLink(THREE.ImageUtils.loadTexture("img/githubIcon.png"), 
 					windowHalfX - 100, windowHalfY - 64, -50, 35, 35);
-				linkedInMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/linkedin.png"), 
+				linkedInMesh = displayPictureLink (THREE.ImageUtils.loadTexture("img/linkedin.png"), 
 					windowHalfX - 60, windowHalfY - 64, -50, 30, 30);
 			}
 
@@ -169,7 +173,7 @@
             e=o.createElement(i);r=o.getElementsByTagName(i)[0];
             e.src='https://www.google-analytics.com/analytics.js';
             r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+            ga('create','UA-24873691-1','auto');ga('send','pageview');
         </script>
     </body>
 </html>

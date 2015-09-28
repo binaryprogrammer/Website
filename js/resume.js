@@ -5,7 +5,9 @@ var pdfMesh;
 function initResume()
 {
 	resumeText = new THREE.Group();
-	pdfMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/PDFLogo.png"), -windowHalfX + 320, windowHalfY-64, -60, 50, 50);
+	pdfMesh = makePictureLink (THREE.ImageUtils.loadTexture("img/pdf.png"), -windowHalfX + 320, windowHalfY-64, -60, 50, 50);
+	pdfMesh.visible = false;
+	scene.add(pdfMesh);
 	//resumeText.add(pdfMesh);
 
 	var text; //TODO: Geometry merge all the text here then enable disable the visibility.
@@ -64,9 +66,15 @@ function initResume()
 function showResume()
 {
 	resumeText.visible = true;
+	links.push(pdfMesh);
+	pdfMesh.visible = true;
+	//scene.add(pdfMesh);
 }
 
 function hideResume()
 {
 	resumeText.visible = false;
+	links.pop(pdfMesh);
+	pdfMesh.visible = false;
+	//scene.remove(pdfMesh);
 }

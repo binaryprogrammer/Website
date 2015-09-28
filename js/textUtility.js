@@ -28,8 +28,7 @@ function initText()
     return textMaterial;
 }
 
-//Returns the displayed text as a Mesh.
-function displayText(message)
+function createText(message)
 {
     if (textMaterial === undefined) //our texturemap hasn't been created yet, create it.
         initText();
@@ -84,12 +83,26 @@ function displayText(message)
 
     var text = new THREE.Mesh(geometry, textMaterial);
     text.scale.set(10, 10, 1);
-    //scene.add(text);
     return text;
 }
 
+//Returns the displayed text as a Mesh.
+function displayText(message)
+{
+    var mesh = createText(message);
+    scene.add(mesh);
+    return mesh;
+}
+
+function displayLink(message)
+{
+    var mesh = displayText(message);
+    links.push(mesh);
+    return mesh;
+}
+
 //Slow function. Delete asap
-function makeLink(message, parameters, x, y, z)
+/*function makeLink(message, parameters, x, y, z)
 {
     if ( parameters === undefined ) 
         parameters = {};
@@ -135,4 +148,4 @@ function makeLink(message, parameters, x, y, z)
     scene.add(sprite);
     
     return mesh; //return the mesh so we can store it to check against it later.
-}
+}*/

@@ -6,52 +6,16 @@ function initBio()
 	bioText = new THREE.Group();
 
 	var text; //TODO: Geometry merge all the text here then enable disable the visibility.
-	text = displayText( " SOFTWARE SKILLS ");
+	text = displayText( " Nathan Moore ");
 	text.position.set(-500,200,90);
 	bioText.add(text);
 
-	text = displayText(" Proficient in: C#, AS3, Unity ");
+	text = displayText(" I make stuff ");
 	text.position.set(-500,185,90);
 	bioText.add(text);
 
-	text = displayText(" Experience in: JavaScript, Obj-C, Java ");
+	text = displayText(" Mostly games ");
 	text.position.set(-500,170,90);
-	bioText.add(text);
-
-	text = displayText(" Familiar with: HTML5, CSS, HLSL ");
-	text.position.set(-500,155,90);
-	bioText.add(text);
-
-	text = displayText(" JOB EXPERIENCE ");
-	text.position.set(105,155,200);
-	bioText.add(text);
-
-	text = displayText(" Programmer @ 2by2 Gaming ");
-	text.position.set(105,140,200);
-	bioText.add(text);
-	
-	text = displayText(" Lab Assistant @ Flashpoint Academy ");
-	text.position.set(105,125,200);
-	bioText.add(text);
-
-	text = displayText(" Unity Programmer @ High Voltage Software ");
-	text.position.set(105,110,200);
-	bioText.add(text);
-
-	text = displayText(" PROJECT EXPERIENCE ");
-	text.position.set(105,-50,250);
-	bioText.add(text);
-
-	text = displayText(" Infinity ");
-	text.position.set(105,-65,250);
-	bioText.add(text);
-
-	text = displayText(" Spero ");
-	text.position.set(105,-80,250);
-	bioText.add(text);
-
-	text = displayText(" Golden Age of Copper ");
-	text.position.set(105,-95,250);
 	bioText.add(text);
 
 	scene.add(bioText);

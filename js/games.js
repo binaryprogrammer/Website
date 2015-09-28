@@ -6,9 +6,9 @@ function initGames()
 	gamesText = new THREE.Group();
 
 
-	text = displayText(" Infinity ");
-	text.position.set(-500,170,90);
-	gamesText.add(text);
+	//var text = displayText(" Infinity ");
+	//text.position.set(-500,170,90);
+	//gamesText.add(text);
 
 	scene.add(gamesText);
 	gamesText.visible = false;

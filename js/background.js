@@ -71,8 +71,6 @@ function createBackgroundParticles()
             particleFade.push(-Math.random()/1000);
         else
             particleFade.push(Math.random()/1000);
-
-        console.log(Math.random());
         
         //TODO: animate the numbers in and out.
     }

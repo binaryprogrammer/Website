@@ -74,7 +74,11 @@ function showResume()
 function hideResume()
 {
 	resumeText.visible = false;
-	links.pop(pdfMesh);
+	
+	var index = links.indexOf(pdfMesh);
+	if (index > -1)
+ 	   links.splice(index, 1);
+
 	pdfMesh.visible = false;
 	//scene.remove(pdfMesh);
 }

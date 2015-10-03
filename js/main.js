@@ -111,6 +111,14 @@ function checkMouseAgainstButtons(raycaster)
         {
             
         }
+        else if (intersects.object == infinityMesh)
+        {
+            //switchVideos
+        }
+        else if (intersects.object == schoolDemoMesh)
+        {
+            //switchVideos
+        }
     }
 }
 
@@ -144,7 +152,6 @@ function checkMouseAgainstLinks(raycaster)
             console.log("resume clicked");
             hideAll();
             showResume();
-            //TODO: display resume
         }
         else if (intersect.object == pdfMesh)
         {
@@ -165,7 +172,7 @@ function checkMouseAgainstLinks(raycaster)
             console.log("github clicked");
             window.open("https://github.com/binaryprogrammer");
         }
-        else if (intersect.object == playInfinityMesh || intersect.object == infinityMesh)
+        else if (intersect.object == playInfinityMesh)
         {
             console.log("play Infinity");
             //TODO: open infinity in new window

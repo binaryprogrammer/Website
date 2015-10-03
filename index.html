@@ -25,8 +25,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.3.min.js"><\/script>')</script>
 		
-		<script src="js/VideoController.js"></script>
-		
         <script src="js/vendor/three.min.js"></script>			<!-- three.js minnified js library -->
 
 		<script src="js/vendor/renderers/Projector.js"></script>			<!-- Camera helper class -->
@@ -59,13 +57,9 @@
 			var stats, displayStats = true; //variables for debugging
 			var container;
 			var camera, camTarget, scene, renderer; //variables for the page
-			var video, image, imageContext,
-			imageReflection, imageReflectionContext, imageReflectionGradient,
-			texture, textureReflection;
-
-			var videoMesh, reflectionMesh, playPauseMesh, volumeMesh, seekMesh;
+			
 			var homeMesh, gamesMesh, bioMesh, resumeMesh, linkedInMesh, twitterMesh, gitHubMesh;
-			var playInfinityMesh, infinityMesh;
+			var playInfinityMesh;
 			var buttons = [ ];
 			var links = [ ];
 			
@@ -98,12 +92,9 @@
 				initBio();
 				initGames();
 				loadVideos();
-                //displayVideos();
 				createNavigationBar(); //Creates the links on the top of the screen.
 				createBackgroundParticles(); //create the binary particles in the background.
 				displayBackgroundLogo();
-
-				video = document.getElementById( 'video' );
                 
 				//Pre-load the video assets.
 				THREE.ImageUtils.loadTexture("img/Play.png");
@@ -156,12 +147,19 @@
 				bioMesh = displayLink(" bio ");
 				bioMesh.position.set(-windowHalfX + 400, windowHalfY - 32, 100);
 
-				twitterMesh = displayPictureLink (THREE.ImageUtils.loadTexture("img/twitter.png"), 
-					windowHalfX - 140, windowHalfY - 64, -50, 35, 35);
-				gitHubMesh = displayPictureLink(THREE.ImageUtils.loadTexture("img/githubIcon.png"), 
-					windowHalfX - 100, windowHalfY - 64, -50, 35, 35);
-				linkedInMesh = displayPictureLink (THREE.ImageUtils.loadTexture("img/linkedin.png"), 
-					windowHalfX - 60, windowHalfY - 64, -50, 30, 30);
+				var loader = new THREE.TextureLoader();
+			    loader.load( 'img/twitter.png', function ( texture ) 
+			        {
+			            twitterMesh = displayPictureLink (texture, windowHalfX - 140, windowHalfY - 64, -50, 35, 35);
+			        });
+			    loader.load( 'img/githubIcon.png', function ( texture ) 
+			        {
+			            gitHubMesh = displayPictureLink (texture, windowHalfX - 100, windowHalfY - 64, -50, 35, 35);
+			        });
+			    loader.load( 'img/linkedin.png', function ( texture ) 
+			        {
+			            linkedInMesh = displayPictureLink (texture, windowHalfX - 60, windowHalfY - 64, -50, 30, 30);
+			        });
 			}
 
 		</script>

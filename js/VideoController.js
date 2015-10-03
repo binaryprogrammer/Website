@@ -28,3 +28,4 @@ seekBar.addEventListener("change", function() {
   seekBar.addEventListener("mouseup", function() {
   video.play();
   });*/
+  
